@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "node_modules/.bin/mocha --reporter mocha-circleci-reporter test/*.js"
   },
   "repository": {
     "type": "git",
@@ -22,5 +22,9 @@
   "dependencies": {
     "moment": "^2.14.1",
     "redis": "^2.6.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha-circleci-reporter": "0.0.1"
   }
 }
