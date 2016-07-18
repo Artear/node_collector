@@ -1,0 +1,26 @@
+{
+  "name": "node_collector",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Artear/node_collector.git"
+  },
+  "keywords": [
+    "node"
+  ],
+  "author": "Martín Moreno",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Artear/node_collector/issues"
+  },
+  "homepage": "https://github.com/Artear/node_collector#readme",
+  "dependencies": {
+    "moment": "^2.14.1",
+    "redis": "^2.6.2"
+  }
+}
