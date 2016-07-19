@@ -196,6 +196,12 @@ describe('Testing Collector', function () {
         );
 
         logger.messageWithTitle(collector1.name, "Starting");
+
+        /** Override these parameters for testing proposes */
+        collector1.keep_alive_millis = 500;
+        collector2.keep_alive_millis = 500;
+        /** ********************************* **/
+
         collector1.startCollecting();
 
         var interval = setInterval(function () {
