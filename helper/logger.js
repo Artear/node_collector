@@ -1,10 +1,15 @@
+var mute = false;
 
 module.exports = {
-
+    mute: function (mute_value) {
+        if (typeof mute_value === 'undefined') {
+            mute_value = true;
+        }
+        mute = Boolean(mute_value);
+    },
     messageWithTitle: function (title, message) {
         logMessage(title, JSON.stringify(message));
     },
-
     message: function () {
 
         var message = '';
@@ -25,8 +30,10 @@ var getBeatuyfullTime = function () {
 };
 
 var logMessage = function (title, message) {
-    console.log("************ " + title + " ************");
-    console.log(message);
-    console.log(getBeatuyfullTime());
-    console.log("*********************************");
+    if (!mute) {
+        console.log("************ " + title + " ************");
+        console.log(message);
+        console.log(getBeatuyfullTime());
+        console.log("*********************************");
+    }
 };

@@ -21,7 +21,8 @@
   "homepage": "https://github.com/Artear/node_collector#readme",
   "dependencies": {
     "moment": "^2.14.1",
-    "redis": "^2.6.2"
+    "redis": "^2.6.2",
+    "superheroes": "^1.0.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
