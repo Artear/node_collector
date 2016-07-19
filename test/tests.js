@@ -198,8 +198,8 @@ describe('Testing Collector', function () {
         logger.messageWithTitle(collector1.name, "Starting");
 
         /** Override these parameters for testing proposes */
-        collector1.keep_alive_millis = 500;
-        collector2.keep_alive_millis = 500;
+        collector1.keep_alive_millis = 200;
+        collector2.keep_alive_millis = 200;
         /** ********************************* **/
 
         collector1.startCollecting();
@@ -214,7 +214,7 @@ describe('Testing Collector', function () {
             logger.messageWithTitle(collector1.name, "=====> Stopping");
             collector1_is_active = false;
             collector1.stopCollecting();
-        }, 1000);
+        }, 500);
     });
 
 });
