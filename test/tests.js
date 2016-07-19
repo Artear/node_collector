@@ -1,14 +1,15 @@
 const test_app_name = 'test_mam';
 const test_app_version = 1;
 
-
 var assert = require('chai').assert;
 var fakeredis = require('fakeredis');
 var Collector = require('../lib/collector');
 var Subscriber = require('../lib/subscriber');
+var logger = require('../helper/logger');
 
 describe('Testing Collector', function () {
 
+    logger.mute();
     var redis_client = null;
     var redis_client_sub = null;
 
@@ -106,7 +107,7 @@ describe('Testing Collector', function () {
             redis_client,
             test_app_name,
             test_app_version,
-            5,
+            100,
             function (saveFn) {
                 collector.stopCollecting();
 
@@ -141,6 +142,7 @@ describe('Testing Collector', function () {
                 50,
                 function (saveFn) {
                     saveFn(test_key, test_data, 5000);
+                    collector.stopCollecting();
                 }
             );
 
@@ -150,8 +152,6 @@ describe('Testing Collector', function () {
                 test_app_name,
                 test_app_version,
                 function (data) {
-                    collector.stopCollecting();
-
                     subscriber.getValue(test_key, function (err, value) {
                         if (err) {
                             throw err;
@@ -166,5 +166,49 @@ describe('Testing Collector', function () {
             collector.startCollecting();
         }
     );
+
+    it('Collector 3 should become master', function (done) {
+
+        var collector1_is_active = true;
+
+        var collector1 = new Collector(
+            redis_client,
+            test_app_name,
+            test_app_version,
+            50,
+            function (saveFn) {
+                logger.messageWithTitle(collector1.name, "onCollect()");
+            }
+        );
+
+        var collector2 = new Collector(
+            redis_client,
+            test_app_name,
+            test_app_version,
+            50,
+            function (saveFn) {
+                if (collector1_is_active) {
+                    throw new Error(collector1.name + " is still active!");
+                } else {
+                    done();
+                }
+            }
+        );
+
+        logger.messageWithTitle(collector1.name, "Starting");
+        collector1.startCollecting();
+
+        var interval = setInterval(function () {
+            clearInterval(interval);
+            collector2.startCollecting();
+        }, 200);
+
+        var interval2 = setInterval(function () {
+            clearInterval(interval2);
+            logger.messageWithTitle(collector1.name, "=====> Stopping");
+            collector1_is_active = false;
+            collector1.stopCollecting();
+        }, 1000);
+    });
 
 });
