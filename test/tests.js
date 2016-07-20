@@ -167,7 +167,7 @@ describe('Testing Collector', function () {
         }
     );
 
-    it('Collector 3 should become master', function (done) {
+    it('Collector 2 should become master', function (done) {
 
         var collector1_is_active = true;
 
