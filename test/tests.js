@@ -267,4 +267,74 @@ describe('Testing Collector', function () {
         }, 200);
     });
 
+    it('Collector Should respect ttl', function (done) {
+        var test_key_short_ttl = "short_key";
+        var test_key_long_ttl = "long_key";
+        var test_data = "Un Cohete a la Luna";
+
+        collector = new Collector(
+            redis_client,
+            test_app_name,
+            test_app_version,
+            50,
+            function (saveFn) {
+                collector.stopCollecting();
+                saveFn(test_key_long_ttl, test_data, 2000);
+                saveFn(test_key_short_ttl, test_data);
+            });
+
+        collector.default_ttl_millis = 1;
+        collector.startCollecting();
+
+        var interval = setInterval(function () {
+            clearInterval(interval);
+            collector.getValue(test_key_long_ttl,
+                function (err, value) {
+                    assert.equal(test_data, value);
+
+                    collector.getValue(test_key_short_ttl,
+                        function (err, no_value) {
+                            assert.equal(null, no_value);
+                            done();
+                        });
+                })
+        }, 200);
+    });
+
+    it('Collector Should get null value safely', function (done) {
+        var test_nonexisting_key = "nonexisting_key";
+
+        collector = new Collector(
+            redis_client,
+            test_app_name,
+            test_app_version,
+            50,
+            function (saveFn) {
+            });
+
+        collector.getValue(test_nonexisting_key,
+            function (err, value) {
+                assert.equal(null, value);
+                done();
+            })
+    });
+
+    it('Subscriber Should get null value safely', function (done) {
+        var test_nonexisting_key = "nonexisting_key";
+
+        subscriber = new Subscriber(
+            redis_client,
+            redis_client_sub,
+            test_app_name,
+            test_app_version,
+            function (data) {
+            });
+
+        subscriber.getValue(test_nonexisting_key,
+            function (err, value) {
+                assert.equal(null, value);
+                done();
+            })
+    });
+
 });
