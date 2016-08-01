@@ -28,7 +28,7 @@ It uses redis to pub/sub operations and storage.
             redis_client_sub,
             test_app_name,
             test_app_version,
-            function (data) {
+            function (err, data) {
                   console.log(data);
                 }
             });
