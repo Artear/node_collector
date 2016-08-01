@@ -99,7 +99,7 @@ describe('Testing Collector', function () {
             redis_client_sub,
             test_app_name,
             test_app_version,
-            function (data) {
+            function (err, data) {
                 if (call_count == 0) {//only execute 1 time
                     call_count++;
                     assert.equal(test_data, data);
@@ -165,7 +165,7 @@ describe('Testing Collector', function () {
                 redis_client_sub,
                 test_app_name,
                 test_app_version,
-                function (data) {
+                function (err, data) {
                     subscriber.getValue(test_key, function (err, value) {
                         if (err) {
                             throw err;
@@ -254,7 +254,7 @@ describe('Testing Collector', function () {
             redis_client_sub,
             test_app_name,
             test_app_version,
-            function (data) {
+            function (err, data) {
                 assert.equal(test_data, data);
                 done();
             });
@@ -335,6 +335,53 @@ describe('Testing Collector', function () {
                 assert.equal(null, value);
                 done();
             })
+    });
+
+    it('Subscriber Should get all values', function (done) {
+        var app_key = "app_key";
+
+        var test_key = "key_all_values_";
+        var test_data = "Un Cohete a la Luna";
+
+        var data_count = 4;
+
+        collector = new Collector(
+            redis_client,
+            test_app_name,
+            test_app_version,
+            10,
+            function (saveFn) {
+                collector.stopCollecting();
+                for (var x = 0; x < data_count; x++) {
+                    saveFn(test_key + x, test_data, 2000);
+                }
+            });
+
+        subscriber = new Subscriber(
+            redis_client,
+            redis_client_sub,
+            test_app_name,
+            test_app_version,
+            function (err, data) {
+            });
+
+        var call_count = 0;
+        var interval = setInterval(function () {
+            clearInterval(interval);
+
+            subscriber.getAllValues(
+                function (err, value) {
+                    assert.equal(test_data, value);
+                    call_count++;
+                    if (call_count ==  data_count - 1) {
+                        done();
+                    }
+                })
+        }, 200);
+
+
+        subscriber.startListening();
+        collector.startCollecting();
     });
 
 });
