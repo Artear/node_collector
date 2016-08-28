@@ -22,6 +22,7 @@
   "dependencies": {
     "moment": "^2.14.1",
     "redis": "^2.6.2",
+    "redisscan": "^1.1.0",
     "superheroes": "^1.0.0"
   },
   "devDependencies": {
