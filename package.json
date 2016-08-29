@@ -1,6 +1,6 @@
 {
   "name": "node_collector",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,6 @@
   "dependencies": {
     "moment": "^2.14.1",
     "redis": "^2.6.2",
-    "redis-scanner": "^0.1.1",
     "superheroes": "^1.0.0"
   },
   "devDependencies": {
