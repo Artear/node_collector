@@ -343,7 +343,7 @@ describe('Testing Collector', function () {
         var test_key = "key_all_values_";
         var test_data = "Un Cohete a la Luna";
 
-        var data_count = 4;
+        var data_count = 40;
 
         collector = new Collector(
             redis_client,
@@ -382,6 +382,6 @@ describe('Testing Collector', function () {
 
         subscriber.startListening();
         collector.startCollecting();
-    });
+    }).timeout(5000);
 
 });
