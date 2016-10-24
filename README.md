@@ -25,13 +25,8 @@ It uses redis to pub/sub operations and storage.
 
         var subscriber = new Subscriber(
             redis_client,
-            redis_client_sub,
             test_app_name,
-            test_app_version,
-            function (err, data) {
-                  console.log(data);
-                }
-            });
+            test_app_version);
 
         subscriber.startListening();
         collector.startCollecting();
