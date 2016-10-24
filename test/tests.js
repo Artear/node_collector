@@ -33,7 +33,7 @@ describe('Testing Collector', function () {
         }
     });
 
-    it('Should collect 5 times', function (done) {
+    it('Collector should collect 5 times', function (done) {
         var call_count = 0;
 
         collector = new Collector(
@@ -52,7 +52,7 @@ describe('Testing Collector', function () {
         collector.startCollecting();
     });
 
-    it('Should collect 1 time, and then stop collection', function (done) {
+    it('Collector should collect 1 time, and then stop collection', function (done) {
         var call_count = 0;
 
         collector = new Collector(
@@ -75,41 +75,6 @@ describe('Testing Collector', function () {
                 }, 10);
             });
 
-        collector.startCollecting();
-    });
-
-    it('Should send data to Subscriptors', function (done) {
-        var test_key = "key";
-        var test_data = "Un Cohete a la Luna";
-
-        collector = new Collector(
-            redis_client,
-            test_app_name,
-            test_app_version,
-            50,
-            function (saveFn) {
-                saveFn(test_key, test_data);
-            }
-        );
-
-        var call_count = 0;
-
-        subscriber = new Subscriber(
-            redis_client,
-            redis_client_sub,
-            test_app_name,
-            test_app_version,
-            function (err, data) {
-                if (call_count == 0) {//only execute 1 time
-                    call_count++;
-                    assert.equal(test_data, data);
-                    collector.stopCollecting();
-
-                    done();
-                }
-            });
-
-        subscriber.startListening();
         collector.startCollecting();
     });
 
@@ -144,42 +109,6 @@ describe('Testing Collector', function () {
 
         collector.startCollecting();
     });
-
-    it('Subscriber Should get saved value', function (done) {
-            var test_key = "key";
-            var test_data = "Un Cohete a la Luna";
-
-            collector = new Collector(
-                redis_client,
-                test_app_name,
-                test_app_version,
-                50,
-                function (saveFn) {
-                    saveFn(test_key, test_data, 5000);
-                    collector.stopCollecting();
-                }
-            );
-
-            subscriber = new Subscriber(
-                redis_client,
-                redis_client_sub,
-                test_app_name,
-                test_app_version,
-                function (err, data) {
-                    subscriber.getValue(test_key, function (err, value) {
-                        if (err) {
-                            throw err;
-                        }
-
-                        assert.equal(test_data, value);
-                        done();
-                    });
-                });
-
-            subscriber.startListening();
-            collector.startCollecting();
-        }
-    );
 
     it('Collector 2 should become master', function (done) {
 
@@ -229,42 +158,6 @@ describe('Testing Collector', function () {
             collector1_is_active = false;
             collector.stopCollecting();
         }, 500);
-    });
-
-    it('Subscriptor Should recover previously saved data', function (done) {
-        var test_key = "key";
-        var test_data = "Un Cohete a la Luna";
-
-        collector = new Collector(
-            redis_client,
-            test_app_name,
-            test_app_version,
-            100,
-            function (saveFn) {
-                collector.stopCollecting();
-                saveFn(test_key, test_data, 2000);
-            });
-
-        /** Override these parameters for testing proposes */
-        collector.keep_alive_millis = 100;
-        /** ********************************* **/
-
-        subscriber = new Subscriber(
-            redis_client,
-            redis_client_sub,
-            test_app_name,
-            test_app_version,
-            function (err, data) {
-                assert.equal(test_data, data);
-                done();
-            });
-
-        collector.startCollecting();
-
-        var interval = setInterval(function () {
-            clearInterval(interval);
-            subscriber.startListening();
-        }, 200);
     });
 
     it('Collector Should respect ttl', function (done) {
@@ -319,16 +212,44 @@ describe('Testing Collector', function () {
             })
     });
 
+    it('Subscriber Should get value', function (done) {
+        var test_key= "key";
+        var test_data = "Un Cohete a la Luna";
+
+        collector = new Collector(
+            redis_client,
+            test_app_name,
+            test_app_version,
+            50,
+            function (saveFn) {
+                collector.stopCollecting();
+                saveFn(test_key, test_data, 5000);
+            });
+
+        collector.startCollecting();
+
+        subscriber = new Subscriber(
+            redis_client,
+            test_app_name,
+            test_app_version);
+
+        var interval = setInterval(function () {
+            clearInterval(interval);
+            subscriber.getValue(test_key,
+                function (err, value) {
+                    assert.equal(value, test_data);
+                    done();
+                })
+        }, 200);
+    });
+
     it('Subscriber Should get null value safely', function (done) {
         var test_nonexisting_key = "nonexisting_key";
 
         subscriber = new Subscriber(
             redis_client,
-            redis_client_sub,
             test_app_name,
-            test_app_version,
-            function (data) {
-            });
+            test_app_version);
 
         subscriber.getValue(test_nonexisting_key,
             function (err, value) {
@@ -336,52 +257,4 @@ describe('Testing Collector', function () {
                 done();
             })
     });
-
-    it('Subscriber Should get all values', function (done) {
-        var app_key = "app_key";
-
-        var test_key = "key_all_values_";
-        var test_data = "Un Cohete a la Luna";
-
-        var data_count = 40;
-
-        collector = new Collector(
-            redis_client,
-            test_app_name,
-            test_app_version,
-            10,
-            function (saveFn) {
-                collector.stopCollecting();
-                for (var x = 0; x < data_count; x++) {
-                    saveFn(test_key + x, test_data, 2000);
-                }
-            });
-
-        subscriber = new Subscriber(
-            redis_client,
-            redis_client_sub,
-            test_app_name,
-            test_app_version,
-            function (err, data) {
-            });
-
-        var call_count = 0;
-        var interval = setInterval(function () {
-            clearInterval(interval);
-
-            subscriber.getAllValues(
-                function (err, value) {
-                    assert.equal(test_data, value);
-                    call_count++;
-                    if (call_count ==  data_count - 1) {
-                        done();
-                    }
-                })
-        }, 200);
-
-
-        subscriber.startListening();
-        collector.startCollecting();
-    }).timeout(5000);
-
 });
