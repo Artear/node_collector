@@ -1,25 +1,29 @@
 const test_app_name = 'test_mam';
 const test_app_version = 1;
 
-var assert = require('chai').assert;
+var chai = require('chai');
+var assert = chai.assert;
+var expect = chai.expect;
+var spies = require('chai-spies');
 var fakeredis = require('fakeredis');
 var Collector = require('../lib/collector');
 var Subscriber = require('../lib/subscriber');
 var logger = require('../helper/logger');
 
 describe('Testing Collector', function () {
-
-    logger.mute();
     var redis_client = null;
     var redis_client_sub = null;
     var collector = null;
     var collector2 = null;
     var subscriber = null;
 
+    chai.use(spies);
+
     beforeEach(function () {
         var redis_name = "random_" + Math.random() * 9999999;
         redis_client = fakeredis.createClient(redis_name, {fast: true});
         redis_client_sub = fakeredis.createClient(redis_name, {fast: true});
+        logger.mute();
     });
 
     afterEach(function () {
@@ -213,7 +217,7 @@ describe('Testing Collector', function () {
     });
 
     it('Subscriber Should get value', function (done) {
-        var test_key= "key";
+        var test_key = "key";
         var test_data = "Un Cohete a la Luna";
 
         collector = new Collector(
@@ -257,4 +261,39 @@ describe('Testing Collector', function () {
                 done();
             })
     });
+
+    it('Collector should throw an exception when onCollectFn is not a function', function () {
+
+        expect(
+            function () {
+                new Collector(
+                    redis_client,
+                    test_app_name,
+                    test_app_version,
+                    100,
+                    null
+                );
+            })
+            .to
+            .throw(Error);
+
+    });
+
+    it('Logger should write to log', function () {
+        logger.mute(false);
+        var oldLog = console.log;//save default log function
+        var dummyLog = function () {
+        };
+
+        var spy = chai.spy(dummyLog);
+
+        console.log = spy;
+
+        logger.message('some message');
+
+        expect(spy).to.have.been.called.min(1);
+
+        console.log = oldLog;//restore default log function
+        logger.mute();
+    })
 });
