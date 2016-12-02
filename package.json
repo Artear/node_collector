@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "coveralls": "^2.11.15",
     "fakeredis": "^1.0.3",
     "mocha-circleci-reporter": "0.0.1",
     "mockery": "^1.7.0"

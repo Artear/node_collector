@@ -2,6 +2,7 @@ const test_app_name = 'test_mam';
 const test_app_version = 1;
 
 var assert = require('chai').assert;
+var expect = require('chai').expect;
 var fakeredis = require('fakeredis');
 var Collector = require('../lib/collector');
 var Subscriber = require('../lib/subscriber');
@@ -213,7 +214,7 @@ describe('Testing Collector', function () {
     });
 
     it('Subscriber Should get value', function (done) {
-        var test_key= "key";
+        var test_key = "key";
         var test_data = "Un Cohete a la Luna";
 
         collector = new Collector(
@@ -256,5 +257,22 @@ describe('Testing Collector', function () {
                 assert.equal(null, value);
                 done();
             })
+    });
+
+    it('Collector should throw an exception when onCollectFn is not a function', function () {
+
+        expect(
+            function () {
+                new Collector(
+                    redis_client,
+                    test_app_name,
+                    test_app_version,
+                    100,
+                    null
+                );
+            })
+            .to
+            .throw(Error);
+
     });
 });
