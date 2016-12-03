@@ -1,5 +1,5 @@
 dependencies:
-  pre:
+  override:
     - npm install
     - npm install -g istanbul
 
