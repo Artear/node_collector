@@ -4,6 +4,7 @@ dependencies:
 
 test:
   override:
+  - npm install
   - npm run test
 
   post:
