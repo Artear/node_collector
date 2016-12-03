@@ -1,6 +1,7 @@
 # Node Collector
 
 master [![CircleCI](https://circleci.com/gh/Artear/node_collector/tree/master.svg?style=svg)](https://circleci.com/gh/Artear/node_collector/tree/master)
+[![Coverage Status](https://coveralls.io/repos/github/Artear/node_collector/badge.svg?branch=coveralls)](https://coveralls.io/github/Artear/node_collector?branch=coveralls)
 
 Node Collector is a node module built to collect data from any source, and distribute it to different subscribers.
 
