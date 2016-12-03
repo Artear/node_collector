@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/mocha --reporter mocha-circleci-reporter test/*.js"
+    "test": "istanbul cover node_modules/.bin/_mocha test/*.js -- -R spec"
   },
   "repository": {
     "type": "git",
